@@ -10,7 +10,7 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: 'http://localhost:5000/auth/callback'
+                redirectTo: 'http://localhost:5173'
             }
         });
 
@@ -28,7 +28,6 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
 
 export const googleCallback = async (req: Request, res: Response): Promise<void> => {
     try {
-        // Extract the access token from the URL
         const {accessToken} = req.body;
 
         if (!accessToken) {
@@ -36,7 +35,6 @@ export const googleCallback = async (req: Request, res: Response): Promise<void>
             return;
         }
 
-        // Decode the JWT token to get user details
         const decodedToken = jwtDecode(accessToken) as any;
 
         if (!decodedToken || !decodedToken.email) {
@@ -46,7 +44,7 @@ export const googleCallback = async (req: Request, res: Response): Promise<void>
 
         // Extract user info from the decoded token
         const userEmail = decodedToken.email;
-        const userId = decodedToken.sub; // Unique identifier for the user
+        const userId = decodedToken.sub; 
         const fullName = decodedToken.user_metadata.full_name || 'Unknown';
         const firstName = fullName.split(' ')[0];
         const lastName = fullName.split(' ')[1] || '';
