@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { supabase } from '../config/supabase';
 import { PrismaClient } from '@prisma/client';
+import { jwtDecode } from "jwt-decode";
 
 const prisma = new PrismaClient();
 
@@ -8,6 +9,9 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
     try {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
+            options: {
+                redirectTo: 'http://localhost:5000/auth/callback'
+            }
         });
 
         if (error) {
@@ -18,56 +22,62 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
         // Redirect to Google's OAuth URL
         res.redirect(data.url);
     } catch (err) {
-        console.error('Google Login Error:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
 export const googleCallback = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { data, error } = await supabase.auth.exchangeCodeForSession(req.query.code as string);
+        // Extract the access token from the URL
+        const {accessToken} = req.body;
 
-
-        if (error) {
-            res.status(500).json({ error: 'Google callback failed' });
+        if (!accessToken) {
+            res.status(400).json({ error: 'Access token not provided' });
             return;
         }
 
-        const { user } = data.session ?? {};
+        // Decode the JWT token to get user details
+        const decodedToken = jwtDecode(accessToken) as any;
 
-        if (!user) {
-            res.status(401).json({ error: 'No user found' });
+        if (!decodedToken || !decodedToken.email) {
+            res.status(400).json({ error: 'Invalid token or email not found' });
             return;
         }
 
-        if (!user.email) {
-            res.status(400).json({ error: 'Email not provided by Google' });
-            return 
-        }
+        // Extract user info from the decoded token
+        const userEmail = decodedToken.email;
+        const userId = decodedToken.sub; // Unique identifier for the user
+        const fullName = decodedToken.user_metadata.full_name || 'Unknown';
+        const firstName = fullName.split(' ')[0];
+        const lastName = fullName.split(' ')[1] || '';
 
-        // Check if the user exists
+        // Check if the user exists by email
         let existingUser = await prisma.user.findUnique({
             where: {
-                googleId: user.id,
+                email: userEmail,
             },
         });
-          
+
         // If user doesn't exist, create a new one
         if (!existingUser) {
             existingUser = await prisma.user.create({
                 data: {
-                    googleId: user.id,
-                    email: user.email,
-                    firstName: user.user_metadata?.given_name ?? 'Unknown',
-                    lastName: user.user_metadata?.family_name ?? 'Unknown',
+                    googleId: userId,
+                    email: userEmail,
+                    firstName: firstName,
+                    lastName: lastName,
                 },
             });
+
+            console.log('New user added:', existingUser);
+        } else {
+            console.log('User already exists:', existingUser);
         }
 
-        // Set a session or token (this is just an example, adapt to your needs)
-        res.status(200).json({ message: 'Login successful', user: existingUser });
+        // Redirect or send success response
+        res.status(200).json({ message: 'User successfully authenticated', user: existingUser });
+
     } catch (err) {
-        console.error('Google Callback Error:', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
