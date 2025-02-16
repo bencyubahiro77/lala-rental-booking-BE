@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { supabase } from '../config/supabase';
 import { PrismaClient } from '@prisma/client';
 import { jwtDecode } from "jwt-decode";
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
@@ -67,13 +68,29 @@ export const googleCallback = async (req: Request, res: Response): Promise<void>
                 },
             });
 
-            console.log('New user added:', existingUser);
+            console.log('New user added:');
         } else {
-            console.log('User already exists:', existingUser);
+            console.log('User already exists:');
         }
 
-        // Redirect or send success response
-        res.status(200).json({ message: 'User successfully authenticated', user: existingUser });
+        // Create JWT Token with role and other user info
+        const token = jwt.sign(
+            {
+                id: existingUser.id,
+                email: existingUser.email,
+                role: existingUser.role,   
+                firstName: existingUser.firstName,
+                lastName: existingUser.lastName
+            },
+            process.env.JWT_SECRET as string,
+            { expiresIn: '1y' }
+        );
+
+        // Send success response with token and user info
+        res.status(200).json({ 
+            message: 'User successfully authenticated', 
+            token 
+        });
 
     } catch (err) {
         res.status(500).json({ error: 'Internal server error' });
