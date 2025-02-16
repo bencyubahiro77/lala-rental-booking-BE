@@ -89,7 +89,7 @@ export const googleCallback = async (req: Request, res: Response): Promise<void>
         // Send success response with token and user info
         res.status(200).json({ 
             message: 'User successfully authenticated', 
-            token 
+            "token":token
         });
 
     } catch (err) {
