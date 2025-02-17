@@ -16,6 +16,20 @@ model User {
   role      Role     @default(Renters)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  properties Property[] @relation("UserProperties")
+}
+
+model Property {
+  id            String   @id @default(uuid())
+  title         String
+  description   String
+  pricePerNight Float
+  location      String
+  hostId        String
+  hostName      String  
+  host          User     @relation("UserProperties", fields: [hostId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 enum Role {

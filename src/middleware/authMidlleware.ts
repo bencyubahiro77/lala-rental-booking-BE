@@ -7,7 +7,8 @@ export const protect = (roles: string[]) => {
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ message: 'Unauthorized: Token not provided or invalid format' });
+            res.status(401).json({ message: 'Unauthorized: Token not provided or invalid format' });
+            return
         }
 
         const token = authHeader.split(' ')[1]; // Extract the token
@@ -21,13 +22,15 @@ export const protect = (roles: string[]) => {
 
             // Check if the user's role is in the list of allowed roles
             if (!roles.includes(decoded.role)) {
-                return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+                res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+                return
             }
 
             // Proceed to the next middleware or route handler if the user has the required role
             next();
         } catch (err) {
             res.status(401).json({ message: 'Token invalid' });
+            return
         }
     };
 };

@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from 'dotenv';
 import { connectDB } from './config/dbConfig';
 import authRoutes from "./routes/authRoutes"
-// import userRoutes from "./routes/userRoutes";
+import propertyRoutes from "./routes/propertyRoutes";
 // import blogRoutes from "./routes/blogRoutes";
 
 dotenv.config();
@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(cors({ origin: '*' }));
 
 app.use('/auth', authRoutes);
-// app.use('/user', userRoutes);
+app.use('/property', propertyRoutes);
 // app.use('/blog', blogRoutes);
 
 const startServer = async() => {

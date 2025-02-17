@@ -82,7 +82,7 @@ export const googleCallback = async (req: Request, res: Response): Promise<void>
                 firstName: existingUser.firstName,
                 lastName: existingUser.lastName
             },
-            process.env.JWT_SECRET as string,
+            process.env.JWT_SECRET! as string,
             { expiresIn: '1y' }
         );
 
