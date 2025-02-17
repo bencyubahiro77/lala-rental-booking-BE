@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/dbConfig';
 import authRoutes from "./routes/authRoutes"
 import propertyRoutes from "./routes/propertyRoutes";
-// import blogRoutes from "./routes/blogRoutes";
+import bookingRoutes from "./routes/bookingRoutes";
 
 dotenv.config();
 
@@ -16,7 +16,7 @@ app.use(cors({ origin: '*' }));
 
 app.use('/auth', authRoutes);
 app.use('/property', propertyRoutes);
-// app.use('/blog', blogRoutes);
+app.use('/booking', bookingRoutes);
 
 const startServer = async() => {
   app.listen(PORT, async() => {
