@@ -23,8 +23,9 @@ export const createProperty = async (req: any, res: Response) => {
         const newProperty = await prisma.property.create({
             data: {
                 title,
+                propertyImage: req.file?.path || null,
                 description,
-                pricePerNight,
+                pricePerNight: parseFloat(pricePerNight),
                 location,
                 hostName: user.firstName + " " + user.lastName,
                 hostId: user.id
@@ -116,6 +117,7 @@ export const updateOneProperty = async (req: any, res: Response) => {
                 description: description || property.description,
                 pricePerNight: pricePerNight || property.pricePerNight,
                 location: location || property.location,
+                propertyImage: req.file?.path || property.propertyImage
             },
         });
 
