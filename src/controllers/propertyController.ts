@@ -115,7 +115,7 @@ export const updateOneProperty = async (req: any, res: Response) => {
             data: {
                 title: title || property.title,
                 description: description || property.description,
-                pricePerNight: pricePerNight || property.pricePerNight,
+                pricePerNight: pricePerNight ? parseFloat(pricePerNight) : property.pricePerNight,
                 location: location || property.location,
                 propertyImage: req.file?.path || property.propertyImage
             },
