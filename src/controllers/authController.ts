@@ -11,7 +11,7 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: 'http://localhost:5173'
+                redirectTo: process.env.Frontend_URL,
             }
         });
 

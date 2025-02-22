@@ -34,7 +34,7 @@ export const createBooking = async (req: any, res: Response) => {
 
         // If any confirmed booking conflicts with the new booking's dates, return an error
         if (existingBookings.length > 0) {
-            res.status(400).json({
+            res.status(409).json({
                 message: 'The property is not available for the selected dates.',
             });
             return

@@ -1,9 +1,9 @@
 import { v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
-    cloud_name: 'dtzhtpy1f',
-    api_key: '575215189441874',
-    api_secret: 's0GuyQNieAREca4qoUK8shGSqFM',
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 
