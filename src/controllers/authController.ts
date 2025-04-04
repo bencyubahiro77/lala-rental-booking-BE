@@ -12,6 +12,9 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
             provider: 'google',
             options: {
                 redirectTo: process.env.Frontend_URL,
+                queryParams:{
+                    prompt:"select_account"
+                },
             }
         });
 
@@ -67,11 +70,7 @@ export const googleCallback = async (req: Request, res: Response): Promise<void>
                     lastName: lastName,
                 },
             });
-
-            console.log('New user added:');
-        } else {
-            console.log('User already exists:');
-        }
+        } 
 
         // Create JWT Token with role and other user info
         const token = jwt.sign(
